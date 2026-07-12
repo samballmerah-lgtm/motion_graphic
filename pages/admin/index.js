@@ -8,9 +8,8 @@ export default function AdminDashboard() {
     const [tab, setTab] = useState('licenses');
     const [licenses, setLicenses] = useState([]);
     const [coupons, setCoupons] = useState([]);
+    const [downloads, setDownloads] = useState([]); // State untuk unduhan
     const [message, setMessage] = useState('');
-    
-    // State Filter Pencarian Baru
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
@@ -51,28 +50,33 @@ export default function AdminDashboard() {
         if (res.ok) setCoupons(data.coupons);
     }
 
+    async function loadDownloads() {
+        const res = await fetch('/api/admin/downloads', { headers: authHeaders() });
+        const data = await res.json();
+        if (res.ok) setDownloads(data.downloads);
+    }
+
     useEffect(() => {
         if (!authed) return;
         if (tab === 'licenses') loadLicenses();
         if (tab === 'coupons') loadCoupons();
+        if (tab === 'downloads') loadDownloads();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authed, tab]);
 
-    // Fungsi Hapus Permanen yang Diperbaiki
     async function deleteLicense(id, key) {
-        if (!confirm(`Hapus permanen lisensi: ${key} dari database?\nTindakan ini tidak bisa dibatalkan.`)) return;
-        
+        if (!confirm(`Hapus permanen lisensi: ${key}?\nTindakan ini tidak bisa dibatalkan.`)) return;
         try {
             const res = await fetch('/api/admin/licenses', { 
                 method: 'DELETE', 
                 headers: authHeaders(), 
                 body: JSON.stringify({ id }) 
             });
-            const data = await res.json();
             if (res.ok) {
-                setMessage(`Berhasil: Lisensi ${key} telah dihapus permanen.`);
+                setMessage(`Berhasil: Lisensi ${key} telah dihapus.`);
                 loadLicenses();
             } else {
+                const data = await res.json();
                 setMessage(`Gagal menghapus: ${data.error}`);
             }
         } catch (err) {
@@ -80,7 +84,45 @@ export default function AdminDashboard() {
         }
     }
 
-    // Melakukan filter pencarian instan di sisi klien
+    // Fungsi Baru: Tambah Rilis Unduhan Aplikasi
+    async function createDownload(e) {
+        e.preventDefault();
+        const f = e.target;
+        const body = {
+            app_name: f.app_name.value,
+            version: f.version.value,
+            download_url: f.download_url.value,
+        };
+        const res = await fetch('/api/admin/downloads', { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) });
+        const data = await res.json();
+        setMessage(res.ok ? `Rilis versi ${data.download.version} berhasil ditambahkan.` : `Gagal: ${data.error}`);
+        if (res.ok) {
+            f.reset();
+            loadDownloads();
+        }
+    }
+
+    // Fungsi Baru: Hapus Rilis Unduhan Aplikasi
+    async function deleteDownload(id, version) {
+        if (!confirm(`Hapus permanen rilis versi: ${version}?\nTautan unduhan tidak akan dapat diakses oleh publik.`)) return;
+        try {
+            const res = await fetch('/api/admin/downloads', { 
+                method: 'DELETE', 
+                headers: authHeaders(), 
+                body: JSON.stringify({ id }) 
+            });
+            if (res.ok) {
+                setMessage(`Berhasil: Rilis versi ${version} telah dihapus.`);
+                loadDownloads();
+            } else {
+                const data = await res.json();
+                setMessage(`Gagal menghapus: ${data.error}`);
+            }
+        } catch (err) {
+            setMessage(`Error: ${err.message}`);
+        }
+    }
+
     const filteredLicenses = licenses.filter((l) => {
         const query = searchQuery.toLowerCase();
         return (
@@ -141,7 +183,8 @@ export default function AdminDashboard() {
             <h1>Admin Dashboard</h1>
             <div style={{ marginBottom: 16 }}>
                 <button onClick={() => setTab('licenses')} style={{ marginRight: 8, fontWeight: tab === 'licenses' ? 'bold' : 'normal' }}>Lisensi</button>
-                <button onClick={() => setTab('coupons')} style={{ fontWeight: tab === 'coupons' ? 'bold' : 'normal' }}>Kupon</button>
+                <button onClick={() => setTab('coupons')} style={{ marginRight: 8, fontWeight: tab === 'coupons' ? 'bold' : 'normal' }}>Kupon</button>
+                <button onClick={() => setTab('downloads')} style={{ fontWeight: tab === 'downloads' ? 'bold' : 'normal' }}>Unduhan 📥</button>
             </div>
 
             {message && <p style={{ color: '#10b981', fontWeight: 'bold' }}>{message}</p>}
@@ -163,7 +206,6 @@ export default function AdminDashboard() {
                         <button type="submit">Buat</button>
                     </form>
 
-                    {/* Filter Pencarian Baru */}
                     <div style={{ marginBottom: 16 }}>
                         <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 6 }}>🔍 Cari Lisensi:</label>
                         <input 
@@ -234,6 +276,43 @@ export default function AdminDashboard() {
                                     <td>{c.discount_type === 'free_trial' ? `${c.trial_days}d` : c.discount_value}</td>
                                     <td>{c.used_count}/{c.max_uses}</td>
                                     <td>{c.expires_at ? new Date(c.expires_at).toLocaleDateString('id-ID') : '-'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </>
+            )}
+
+            {/* TAB BARU: MANAJEMEN UNDUHAN */}
+            {tab === 'downloads' && (
+                <>
+                    <h3>Tambah Berkas Unduhan Baru</h3>
+                    <form onSubmit={createDownload} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+                        <input name="app_name" placeholder="Nama Aplikasi (mis. SVG Motion)" required style={{ minWidth: 180 }} />
+                        <input name="version" placeholder="Versi (mis. v2.5.7)" required style={{ minWidth: 100 }} />
+                        <input name="download_url" placeholder="URL Unduhan ZIP" required style={{ minWidth: 260 }} />
+                        <button type="submit">Tambah Rilis</button>
+                    </form>
+
+                    <h3>Daftar Rilis Versi ({downloads.length})</h3>
+                    <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%', fontSize: 13 }}>
+                        <thead>
+                            <tr style={{ background: '#f3f4f6' }}><th>Nama Aplikasi</th><th>Versi</th><th>Tautan Unduh</th><th>Tanggal Ditambahkan</th><th>Aksi</th></tr>
+                        </thead>
+                        <tbody>
+                            {downloads.map((d) => (
+                                <tr key={d.id}>
+                                    <td style={{ fontWeight: 'bold' }}>{d.app_name}</td>
+                                    <td style={{ color: '#3b82f6', fontWeight: 'bold' }}>{d.version}</td>
+                                    <td style={{ wordBreak: 'break-all' }}>
+                                        <a href={d.download_url} target="_blank" rel="noreferrer" style={{ color: '#3b82f6' }}>{d.download_url}</a>
+                                    </td>
+                                    <td>{new Date(d.created_at).toLocaleDateString('id-ID')}</td>
+                                    <td>
+                                        <button onClick={() => deleteDownload(d.id, d.version)} style={{ color: '#dc2626', fontWeight: 'bold', cursor: 'pointer' }}>
+                                            Hapus rilis 🗑
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
