@@ -2,24 +2,10 @@
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 
 export default function ThankYou() {
     const router = useRouter();
     const { license_key, type } = router.query;
-    const [copied, setCopied] = useState(false);
-
-    // Fungsi klik salin otomatis ke Clipboard
-    const handleCopy = () => {
-        if (!license_key) return;
-        navigator.clipboard.writeText(license_key);
-        setCopied(true);
-        
-        // Reset ikon kembali normal setelah 2 detik
-        setTimeout(() => {
-            setCopied(false);
-        }, 2000);
-    };
 
     return (
         <>
@@ -40,42 +26,11 @@ export default function ThankYou() {
 
                     <div style={boxStyle}>
                         <p style={labelStyle}>KODE LISENSI ANDA:</p>
-                        
-                        {/* Container Kode yang dapat Diklik untuk Salin */}
-                        <div 
-                            onClick={handleCopy} 
-                            style={{
-                                ...keyWrapperStyle,
-                                borderColor: copied ? '#10b981' : '#3b82f6',
-                                background: copied ? '#0f172a' : '#1e293b'
-                            }} 
-                            title="Klik untuk menyalin"
-                        >
-                            <span style={keyTextStyle}>
-                                {license_key || "Memeriksa..."}
-                            </span>
-                            
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                {copied && <span style={copiedTextStyle}>Tersalin!</span>}
-                                <div style={iconContainerStyle}>
-                                    {copied ? (
-                                        // Ikon Centang Hijau saat berhasil disalin
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                    ) : (
-                                        // Ikon Dokumen Ganda (Copy) Standar
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                        </svg>
-                                    )}
-                                </div>
-                            </div>
+                        <div style={keyContainerStyle}>
+                            {license_key || "Memeriksa..."}
                         </div>
-                        
-                        <p style={{ color: '#94a3b8', fontSize: 11, marginTop: 10, margin: 0 }}>
-                            *Klik kotak di atas untuk menyalin kode. Kode lisensi ini juga sudah dikirim ke WhatsApp dan Email Anda.
+                        <p style={{ color: '#94a3b8', fontSize: 11, marginTop: 8, margin: 0 }}>
+                            *Salin kode di atas. Kode lisensi ini juga sudah dikirim ke WhatsApp dan Email Anda.
                         </p>
                     </div>
 
@@ -103,7 +58,7 @@ export default function ThankYou() {
     );
 }
 
-// CSS Inline Tema Gelap
+// CSS Inline
 const containerStyle = { background: '#0e1013', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, color: '#f8fafc', fontFamily: 'system-ui, sans-serif' };
 const cardStyle = { background: '#16191f', border: '1px solid #1f2937', padding: '32px 24px', borderRadius: 16, width: '100%', maxWidth: 480, boxSizing: 'border-box' };
 const successIconStyle = { width: 50, height: 50, background: '#10b981', color: '#fff', borderRadius: '50%', fontSize: 24, fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' };
@@ -111,45 +66,7 @@ const titleStyle = { margin: 0, fontSize: 22, fontWeight: 'bold', color: '#fff' 
 const subtitleStyle = { margin: '8px 0 0 0', color: '#10b981', fontSize: 13, fontWeight: '600' };
 const boxStyle = { background: '#111317', border: '1px solid #1f2937', borderRadius: 12, padding: 16, textAlign: 'center', marginTop: 20 };
 const labelStyle = { margin: '0 0 8px 0', fontSize: 11, fontWeight: 'bold', color: '#94a3b8', letterSpacing: '0.05em' };
+const keyContainerStyle = { background: '#1e293b', border: '1px dashed #3b82f6', color: '#3b82f6', padding: '10px', borderRadius: 6, fontSize: 16, fontWeight: 'bold', fontFamily: 'monospace' };
 const listStyle = { color: '#cbd5e1', fontSize: 13, paddingLeft: 20, margin: 0, lineHeight: '1.6' };
 const downloadButtonStyle = { display: 'block', width: '100%', padding: 12, background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 13, textAlign: 'center', textDecoration: 'none', marginTop: 20, boxSizing: 'border-box' };
 const linkStyle = { color: '#94a3b8', textDecoration: 'none', fontSize: 12 };
-
-// Styling Kotak Kode Lisensi Interaktif
-const keyWrapperStyle = {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    padding: '12px 16px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    userSelect: 'all',
-    transition: 'all 0.2s ease-in-out'
-};
-
-const keyTextStyle = {
-    color: '#3b82f6',
-    fontSize: 16,
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
-    letterSpacing: '0.02em'
-};
-
-const copiedTextStyle = {
-    fontSize: 11,
-    color: '#10b981',
-    fontWeight: 'bold',
-    letterSpacing: '0.02em'
-};
-
-const iconContainerStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 4,
-    background: '#111317',
-    borderRadius: 6,
-    border: '1px solid #334155'
-};
