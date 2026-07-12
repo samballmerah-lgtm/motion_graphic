@@ -1,17 +1,26 @@
 // pages/api/renew.js
+// Endpoint: POST /api/renew
+// Body: { app_id, license_key, package_type }
+//
+// Alur:
+// 1. Cari lisensi, tampilkan status saat ini (dipanggil dulu via GET untuk cek status
+//    -- lihat handler GET di bawah).
+// 2. Buat transaksi Midtrans Snap untuk paket perpanjangan.
+// 3. Setelah dibayar (via webhook terpisah /api/renew/webhook, lihat catatan di bawah),
+//    durasi baru DIAKUMULASI jika lisensi masih aktif, atau dihitung dari hari ini
+//    jika sudah kedaluwarsa. license_key dan hwid TIDAK berubah.
 
 import { supabase } from '../../lib/supabase';
 
-// Durasi hari untuk masing-masing paket
-const PACKAGE_DAYS = { daily: 1, monthly: 30, yearly: 365, lifetime: 36135 };
-
-// Penyelarasan harga baru perpanjangan sesuai brief
+const PACKAGE_DAYS = { daily: 1, monthly: 30, yearly: 365 };
 const PACKAGE_PRICE = {
-    certgenpro: { daily: 9900, monthly: 29000, yearly: 149000, lifetime: 399000 },
+    // sesuaikan dengan PRICE_TABLE di payment/create.js per app_id jika berbeda
+    certgenpro: { daily: 15000, monthly: 99000, yearly: 799000 },
 };
 
 export default async function handler(req, res) {
     if (req.method === 'GET') {
+        // ---- Cek status lisensi sebelum perpanjangan ----
         const { app_id, license_key } = req.query;
         if (!app_id || !license_key) {
             return res.status(400).json({ error: 'app_id dan license_key wajib diisi' });
@@ -72,7 +81,7 @@ export default async function handler(req, res) {
                     customer_details: { email: license.email, phone: license.whatsapp },
                     custom_field1: app_id,
                     custom_field2: `renew_${package_type}`,
-                    custom_field3: license_key,
+                    custom_field3: license_key, // dipakai webhook untuk tahu lisensi mana yang diperpanjang
                 }),
             }
         );
@@ -81,6 +90,7 @@ export default async function handler(req, res) {
             return res.status(502).json({ error: 'Gagal membuat transaksi Midtrans', detail: midtransData });
         }
 
+        // Simpan order_id sementara di kolom order_id (dipakai webhook renew)
         await supabase.from('licenses').update({ order_id: orderId }).eq('id', license.id);
 
         return res.status(200).json({

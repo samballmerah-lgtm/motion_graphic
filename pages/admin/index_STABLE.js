@@ -1,4 +1,6 @@
 // pages/admin/index.js
+// Dashboard admin sederhana: login password, lihat/buat lisensi, buat kupon.
+// Password disimpan di localStorage browser admin, dikirim sebagai Bearer token.
 
 import { useState, useEffect } from 'react';
 
@@ -9,9 +11,6 @@ export default function AdminDashboard() {
     const [licenses, setLicenses] = useState([]);
     const [coupons, setCoupons] = useState([]);
     const [message, setMessage] = useState('');
-    
-    // State Filter Pencarian Baru
-    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         const saved = typeof window !== 'undefined' && localStorage.getItem('admin_password');
@@ -58,40 +57,6 @@ export default function AdminDashboard() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authed, tab]);
 
-    // Fungsi Hapus Permanen yang Diperbaiki
-    async function deleteLicense(id, key) {
-        if (!confirm(`Hapus permanen lisensi: ${key} dari database?\nTindakan ini tidak bisa dibatalkan.`)) return;
-        
-        try {
-            const res = await fetch('/api/admin/licenses', { 
-                method: 'DELETE', 
-                headers: authHeaders(), 
-                body: JSON.stringify({ id }) 
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setMessage(`Berhasil: Lisensi ${key} telah dihapus permanen.`);
-                loadLicenses();
-            } else {
-                setMessage(`Gagal menghapus: ${data.error}`);
-            }
-        } catch (err) {
-            setMessage(`Error: ${err.message}`);
-        }
-    }
-
-    // Melakukan filter pencarian instan di sisi klien
-    const filteredLicenses = licenses.filter((l) => {
-        const query = searchQuery.toLowerCase();
-        return (
-            (l.license_key && l.license_key.toLowerCase().includes(query)) ||
-            (l.email && l.email.toLowerCase().includes(query)) ||
-            (l.whatsapp && l.whatsapp.toLowerCase().includes(query)) ||
-            (l.created_at && l.created_at.includes(query)) ||
-            (l.expires_at && l.expires_at.includes(query))
-        );
-    });
-
     async function createManualLicense(e) {
         e.preventDefault();
         const f = e.target;
@@ -125,6 +90,12 @@ export default function AdminDashboard() {
         if (res.ok) loadCoupons();
     }
 
+    async function revokeLicense(id) {
+        if (!confirm('Cabut lisensi ini?')) return;
+        const res = await fetch('/api/admin/licenses', { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ id, status: 'revoked' }) });
+        if (res.ok) loadLicenses();
+    }
+
     if (!authed) {
         return (
             <main style={{ maxWidth: 320, margin: '80px auto', fontFamily: 'sans-serif' }}>
@@ -137,64 +108,47 @@ export default function AdminDashboard() {
     }
 
     return (
-        <main style={{ maxWidth: 980, margin: '40px auto', fontFamily: 'sans-serif', padding: 16 }}>
+        <main style={{ maxWidth: 900, margin: '40px auto', fontFamily: 'sans-serif', padding: 16 }}>
             <h1>Admin Dashboard</h1>
             <div style={{ marginBottom: 16 }}>
                 <button onClick={() => setTab('licenses')} style={{ marginRight: 8, fontWeight: tab === 'licenses' ? 'bold' : 'normal' }}>Lisensi</button>
                 <button onClick={() => setTab('coupons')} style={{ fontWeight: tab === 'coupons' ? 'bold' : 'normal' }}>Kupon</button>
             </div>
 
-            {message && <p style={{ color: '#10b981', fontWeight: 'bold' }}>{message}</p>}
+            {message && <p style={{ color: '#333' }}>{message}</p>}
 
             {tab === 'licenses' && (
                 <>
                     <h3>Buat Lisensi Manual</h3>
                     <form onSubmit={createManualLicense} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-                        <input name="app_id" placeholder="app_id" defaultValue="certgenpro" required />
+                        <input name="app_id" placeholder="app_id (mis. certgenpro)" required />
                         <input name="email" placeholder="email" type="email" required />
                         <input name="whatsapp" placeholder="whatsapp (62...)" />
                         <select name="type">
                             <option value="daily">Harian</option>
                             <option value="monthly">Bulanan</option>
                             <option value="yearly">Tahunan</option>
-                            <option value="lifetime">Lifetime</option>
                             <option value="manual">Manual (tanpa expiry)</option>
                         </select>
                         <button type="submit">Buat</button>
                     </form>
 
-                    {/* Filter Pencarian Baru */}
-                    <div style={{ marginBottom: 16 }}>
-                        <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 6 }}>🔍 Cari Lisensi:</label>
-                        <input 
-                            type="text" 
-                            placeholder="Ketik email, nomor WA, tanggal, atau kode lisensi..." 
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{ width: '100%', padding: 10, boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: 6 }}
-                        />
-                    </div>
-
-                    <h3>Daftar Lisensi ({filteredLicenses.length})</h3>
-                    <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%', fontSize: 13 }}>
+                    <h3>Daftar Lisensi</h3>
+                    <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%', fontSize: 14 }}>
                         <thead>
-                            <tr style={{ background: '#f3f4f6' }}><th>Key</th><th>App</th><th>Email</th><th>Type</th><th>Status</th><th>Expires</th><th>HWID</th><th>Aksi</th></tr>
+                            <tr><th>Key</th><th>App</th><th>Email</th><th>Type</th><th>Status</th><th>Expires</th><th>HWID</th><th>Aksi</th></tr>
                         </thead>
                         <tbody>
-                            {filteredLicenses.map((l) => (
+                            {licenses.map((l) => (
                                 <tr key={l.id}>
-                                    <td style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{l.license_key}</td>
+                                    <td>{l.license_key}</td>
                                     <td>{l.app_id}</td>
                                     <td>{l.email}</td>
-                                    <td style={{ textTransform: 'capitalize' }}>{l.type}</td>
+                                    <td>{l.type}</td>
                                     <td>{l.status}</td>
                                     <td>{l.expires_at ? new Date(l.expires_at).toLocaleDateString('id-ID') : '-'}</td>
                                     <td>{l.hwid ? l.hwid.slice(0, 8) + '...' : '-'}</td>
-                                    <td>
-                                        <button onClick={() => deleteLicense(l.id, l.license_key)} style={{ color: '#dc2626', fontWeight: 'bold', cursor: 'pointer' }}>
-                                            Hapus 🗑
-                                        </button>
-                                    </td>
+                                    <td><button onClick={() => revokeLicense(l.id)}>Cabut</button></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -206,7 +160,7 @@ export default function AdminDashboard() {
                 <>
                     <h3>Buat Kupon</h3>
                     <form onSubmit={createCoupon} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-                        <input name="app_id" placeholder="app_id" defaultValue="certgenpro" required />
+                        <input name="app_id" placeholder="app_id" required />
                         <input name="code" placeholder="KODE" required />
                         <select name="discount_type">
                             <option value="percentage">Persentase</option>
@@ -221,14 +175,14 @@ export default function AdminDashboard() {
                     </form>
 
                     <h3>Daftar Kupon</h3>
-                    <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%', fontSize: 13 }}>
+                    <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%', fontSize: 14 }}>
                         <thead>
-                            <tr style={{ background: '#f3f4f6' }}><th>Code</th><th>App</th><th>Type</th><th>Value</th><th>Used/Max</th><th>Expires</th></tr>
+                            <tr><th>Code</th><th>App</th><th>Type</th><th>Value</th><th>Used/Max</th><th>Expires</th></tr>
                         </thead>
                         <tbody>
                             {coupons.map((c) => (
                                 <tr key={c.id}>
-                                    <td style={{ fontWeight: 'bold' }}>{c.code}</td>
+                                    <td>{c.code}</td>
                                     <td>{c.app_id}</td>
                                     <td>{c.discount_type}</td>
                                     <td>{c.discount_type === 'free_trial' ? `${c.trial_days}d` : c.discount_value}</td>

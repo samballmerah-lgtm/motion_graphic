@@ -1,13 +1,16 @@
 // pages/api/admin/licenses.js
+// GET   /api/admin/licenses?app_id=xxx        -> daftar lisensi
+// POST  /api/admin/licenses                   -> buat lisensi manual (backup jika webhook gagal)
+// PATCH /api/admin/licenses                   -> ubah status (mis. revoke) { id, status }
+// Header wajib: Authorization: Bearer <ADMIN_PASSWORD>
 
 import { supabase } from '../../../lib/supabase';
 import { checkAdminAuth } from '../../../lib/adminAuth';
 import { generateLicenseKey, sendWhatsApp, sendEmail, buildLicenseMessage } from '../../../lib/notify';
 
-// Penyelarasan penamaan aplikasi & prefix baru
-const APP_NAMES = { certgenpro: 'SVG Motion' };
-const APP_PREFIXES = { certgenpro: 'SVG' };
-const PACKAGE_DAYS = { daily: 1, monthly: 30, yearly: 365, lifetime: 36135 }; // Ditambahkan paket lifetime
+const APP_NAMES = { certgenpro: 'CertGen Pro' };
+const APP_PREFIXES = { certgenpro: 'CGP' };
+const PACKAGE_DAYS = { daily: 1, monthly: 30, yearly: 365 };
 
 export default async function handler(req, res) {
     if (!checkAdminAuth(req)) return res.status(401).json({ error: 'Unauthorized' });
@@ -69,20 +72,6 @@ export default async function handler(req, res) {
             .single();
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json({ license: data });
-    }
-
-    // ── FITUR BARU: HAPUS LISENSI PERMANEN (DELETE) ──
-    if (req.method === 'DELETE') {
-        const { id } = req.body;
-        if (!id) return res.status(400).json({ error: 'id wajib diisi' });
-
-        const { error } = await supabase
-            .from('licenses')
-            .delete()
-            .eq('id', id);
-
-        if (error) return res.status(500).json({ error: error.message });
-        return res.status(200).json({ message: 'Lisensi berhasil dihapus permanen.' });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });

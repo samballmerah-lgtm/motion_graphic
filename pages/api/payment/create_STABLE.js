@@ -1,20 +1,24 @@
 // pages/api/payment/create.js
+// Endpoint: POST /api/payment/create
+// Body: { app_id, email, whatsapp, package_type, coupon_code }
+// package_type: 'daily' | 'monthly' | 'yearly'
 
 import { supabase } from '../../../lib/supabase';
 import { generateLicenseKey, sendWhatsApp, sendEmail, buildLicenseMessage } from '../../../lib/notify';
 
-// Menyesuaikan harga baru yang diminta
+// ---- Konfigurasi harga & durasi per app_id (sesuaikan / pindahkan ke DB bila perlu) ----
 const PRICE_TABLE = {
     certgenpro: {
-        appName: 'SVG Motion', // Ganti nama aplikasi visual di DB
-        prefix: 'SVG',          // Ganti prefix lisensi
+        appName: 'CertGen Pro',
+        prefix: 'CGP',
         packages: {
-            daily:    { price: 9900,   days: 1 },
-            monthly:  { price: 29000,  days: 30 },
-            yearly:   { price: 149000, days: 365 },
-            lifetime: { price: 399000, days: 36135 }, // 99 Tahun
+            daily:   { price: 15000,  days: 1 },
+            monthly: { price: 99000,  days: 30 },
+            yearly:  { price: 799000, days: 365 },
         },
     },
+    // tambahkan app lain di sini, contoh:
+    // vectorcraft: { appName: 'VectorCraft Pro', prefix: 'VCP', packages: {...} },
 };
 
 export default async function handler(req, res) {
@@ -37,6 +41,7 @@ export default async function handler(req, res) {
         let finalDays = pkg.days;
         let appliedCoupon = null;
 
+        // ---- Validasi kupon jika ada ----
         if (coupon_code) {
             const { data: coupon, error: couponErr } = await supabase
                 .from('coupons')
@@ -57,6 +62,7 @@ export default async function handler(req, res) {
             appliedCoupon = coupon;
 
             if (coupon.discount_type === 'free_trial') {
+                // ---- Jalur FREE TRIAL: skip Midtrans, langsung buat lisensi ----
                 const licenseKey = generateLicenseKey(appConfig.prefix);
                 const expiresAt = new Date(Date.now() + coupon.trial_days * 86400000);
 
@@ -100,6 +106,7 @@ export default async function handler(req, res) {
             }
         }
 
+        // ---- Jalur BAYAR: buat transaksi Midtrans Snap ----
         const orderId = `${app_id}-${package_type}-${Date.now()}`;
 
         const midtransRes = await fetch(
@@ -115,6 +122,7 @@ export default async function handler(req, res) {
                 body: JSON.stringify({
                     transaction_details: { order_id: orderId, gross_amount: finalPrice },
                     customer_details: { email, phone: whatsapp },
+                    // custom_field1 dipakai webhook untuk tahu app_id/package/coupon
                     custom_field1: app_id,
                     custom_field2: package_type,
                     custom_field3: coupon_code || '',
@@ -128,6 +136,7 @@ export default async function handler(req, res) {
             return res.status(502).json({ error: 'Gagal membuat transaksi Midtrans', detail: midtransData });
         }
 
+        // Simpan lisensi PENDING dulu, akan diisi HWID/aktivasi setelah dibayar & diaktivasi klien
         const licenseKey = generateLicenseKey(appConfig.prefix);
         const { error: insertErr } = await supabase.from('licenses').insert({
             app_id,

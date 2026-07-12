@@ -1,16 +1,20 @@
 // pages/api/payment/webhook.js
+// Endpoint: POST /api/payment/webhook
+// Daftarkan URL ini di Midtrans Dashboard > Settings > Configuration >
+// Payment Notification URL. Menangani DUA skenario:
+//   a) Pembelian lisensi baru   (custom_field2 = 'daily' | 'monthly' | 'yearly')
+//   b) Perpanjangan lisensi     (custom_field2 = 'renew_daily' | 'renew_monthly' | 'renew_yearly')
 
 import crypto from 'crypto';
 import { supabase } from '../../../lib/supabase';
 import { sendWhatsApp, sendEmail, buildLicenseMessage } from '../../../lib/notify';
 
-// Ditambahkan mapping nama aplikasi sesuai brief Anda
 const APP_NAMES = {
-    certgenpro: 'SVG Motion',
+    certgenpro: 'CertGen Pro',
+    // tambahkan mapping app_id -> nama tampilan di sini
 };
 
-// Menambahkan durasi lifetime (36135 hari) ke mapping durasi
-const PACKAGE_DAYS = { daily: 1, monthly: 30, yearly: 365, lifetime: 36135 };
+const PACKAGE_DAYS = { daily: 1, monthly: 30, yearly: 365 };
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -19,6 +23,7 @@ export default async function handler(req, res) {
         const notif = req.body;
         const { order_id, status_code, gross_amount, signature_key, transaction_status, custom_field2 } = notif;
 
+        // ---- Verifikasi signature Midtrans (WAJIB) ----
         const expectedSignature = crypto
             .createHash('sha512')
             .update(order_id + status_code + gross_amount + process.env.MIDTRANS_SERVER_KEY)
@@ -46,6 +51,7 @@ export default async function handler(req, res) {
         const isRenewal = typeof custom_field2 === 'string' && custom_field2.startsWith('renew_');
 
         if (isRenewal) {
+            // ---- LOGIKA PERPANJANGAN (akumulasi durasi) ----
             const packageType = custom_field2.replace('renew_', '');
             const addDays = PACKAGE_DAYS[packageType];
             if (!addDays) return res.status(400).json({ error: 'package_type perpanjangan tidak valid' });
@@ -79,16 +85,10 @@ export default async function handler(req, res) {
             return res.status(200).json({ message: 'Perpanjangan berhasil diproses' });
         }
 
+        // ---- LOGIKA PEMBELIAN BARU ----
         if (license.status !== 'pending') {
             return res.status(200).json({ message: 'Sudah diproses sebelumnya' });
         }
-
-        // Jalur Pembelian Baru: perbarui status menjadi active setelah pembayaran sukses
-        const { error: activateErr } = await supabase
-            .from('licenses')
-            .update({ status: 'active' })
-            .eq('id', license.id);
-        if (activateErr) throw activateErr;
 
         const msg = buildLicenseMessage({
             appName,
