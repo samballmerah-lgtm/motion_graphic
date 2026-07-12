@@ -45,9 +45,15 @@ export default function Renew() {
                     onSuccess: () => {
                         window.location.href = `/thankyou?license_key=${data.license_key}`;
                     },
-                    onPending: () => setMessage('Pembayaran tertunda. Selesaikan pembayaran untuk menerima lisensi.'),
-                    onError: () => setMessage('Terjadi kesalahan saat pembayaran.'),
-                    onClose: () => setMessage('Popup pembayaran ditutup.'),
+                    onPending: () => {
+                        setMessage('Pembayaran tertunda. Selesaikan pembayaran untuk menerima lisensi.');
+                    },
+                    onError: () => {
+                        window.location.href = '/failed';
+                    },
+                    onClose: () => {
+                        setMessage('Popup pembayaran ditutup.');
+                    },
                 });
             }
         } catch (err) {
@@ -153,7 +159,6 @@ export default function Renew() {
     );
 }
 
-// CSS Inline Tema Gelap Premium
 const containerStyle = { background: '#0e1013', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, color: '#f8fafc', fontFamily: 'system-ui, sans-serif' };
 const cardStyle = { background: '#16191f', border: '1px solid #1f2937', padding: '32px 24px', borderRadius: 16, width: '100%', maxWidth: 540, boxSizing: 'border-box' };
 const badgeStyle = { background: '#1e293b', color: '#10b981', fontSize: 11, fontWeight: 'bold', padding: '4px 10px', borderRadius: 20, display: 'inline-block', marginBottom: 12 };

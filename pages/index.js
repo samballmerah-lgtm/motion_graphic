@@ -38,9 +38,15 @@ export default function Home() {
                     onSuccess: () => {
                         window.location.href = `/thankyou?license_key=${data.license_key}`;
                     },
-                    onPending: () => setMessage('Pembayaran tertunda. Selesaikan pembayaran untuk menerima lisensi.'),
-                    onError: () => setMessage('Terjadi kesalahan saat pembayaran.'),
-                    onClose: () => setMessage('Popup pembayaran ditutup.'),
+                    onPending: () => {
+                        setMessage('Pembayaran tertunda. Selesaikan pembayaran untuk menerima lisensi.');
+                    },
+                    onError: () => {
+                        window.location.href = '/failed';
+                    },
+                    onClose: () => {
+                        setMessage('Popup pembayaran ditutup.');
+                    },
                 });
             }
         } catch (err) {
@@ -68,7 +74,7 @@ export default function Home() {
                     <div style={{ textAlign: 'center', marginBottom: 24 }}>
                         <span style={badgeStyle}>RILIS TERBARU v2.5.7</span>
                         <h1 style={titleStyle}>Ⓜ️ SVG Motion Studio v2</h1>
-                        <p style={subtitleStyle}>Produksi video animasi dari aset vektor secara massal dalam hitungan detik.</p>
+                        <p style={subtitleStyle}>Produksi video animasi motion graphics dari video referensi secara massal dalam hitungan menit.</p>
                     </div>
 
                     {/* Banner Paket Utama */}
@@ -127,7 +133,7 @@ export default function Home() {
                     {message && <p style={messageStyle}>{message}</p>}
 
                     <div style={{ marginTop: 24, textAlign: 'center', borderTop: '1px solid #1f2937', paddingTop: 16 }}>
-                        <a href="/renew" style={linkStyle}>Sudah punya lisensi? Lakukan Perpanjangan &rarr;</a>
+                        <a href="/renew" style={linkStyle}>Lainnya: Lihat Semua Paket Lisensi &rarr;</a>
                     </div>
                 </main>
             </div>
@@ -135,7 +141,6 @@ export default function Home() {
     );
 }
 
-// Gaya CSS inline tema gelap mewah
 const containerStyle = { background: '#0e1013', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, color: '#f8fafc', fontFamily: 'system-ui, sans-serif' };
 const cardStyle = { background: '#16191f', border: '1px solid #1f2937', padding: '32px 24px', borderRadius: 16, width: '100%', maxWidth: 460, boxSizing: 'border-box' };
 const badgeStyle = { background: '#1e293b', color: '#3b82f6', fontSize: 11, fontWeight: 'bold', padding: '4px 10px', borderRadius: 20, display: 'inline-block', marginBottom: 12 };
@@ -144,6 +149,6 @@ const subtitleStyle = { margin: '8px 0 0 0', color: '#94a3b8', fontSize: 13, lin
 const pricingCardStyle = { background: '#111317', border: '1px solid #10b981', borderRadius: 12, padding: 16, marginBottom: 24, marginTop: 12 };
 const labelStyle = { display: 'block', fontSize: 12, fontWeight: 'bold', color: '#94a3b8', marginBottom: 6 };
 const inputStyle = { display: 'block', width: '100%', padding: 10, background: '#111317', border: '1px solid #1f2937', borderRadius: 8, color: '#fff', fontSize: 13, boxSizing: 'border-box' };
-const buttonStyle = { width: '100%', padding: 12, background: '#10b981', hoverBackground: '#059669', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 14, transition: '0.2s' };
+const buttonStyle = { width: '100%', padding: 12, background: '#10b981', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', fontSize: 14, transition: '0.2s' };
 const linkStyle = { color: '#3b82f6', textDecoration: 'none', fontSize: 12, fontWeight: '500' };
 const messageStyle = { marginTop: 16, padding: 10, background: '#1e293b', border: '1px solid #334155', borderRadius: 8, fontSize: 12, color: '#cbd5e1', textAlign: 'center', lineHeight: '1.4' };
