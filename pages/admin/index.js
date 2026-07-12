@@ -11,6 +11,7 @@ export default function AdminDashboard() {
     const [downloads, setDownloads] = useState([]); // State untuk unduhan
     const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [couponSearchQuery, setCouponSearchQuery] = useState(''); // State baru untuk pencarian kupon
 
     useEffect(() => {
         const saved = typeof window !== 'undefined' && localStorage.getItem('admin_password');
@@ -84,6 +85,27 @@ export default function AdminDashboard() {
         }
     }
 
+    // Fungsi Baru: Hapus Kupon
+    async function deleteCoupon(id, code) {
+        if (!confirm(`Hapus permanen kupon: ${code}?\nTindakan ini tidak bisa dibatalkan.`)) return;
+        try {
+            const res = await fetch('/api/admin/coupons', { 
+                method: 'DELETE', 
+                headers: authHeaders(), 
+                body: JSON.stringify({ id }) 
+            });
+            if (res.ok) {
+                setMessage(`Berhasil: Kupon ${code} telah dihapus.`);
+                loadCoupons();
+            } else {
+                const data = await res.json();
+                setMessage(`Gagal menghapus: ${data.error}`);
+            }
+        } catch (err) {
+            setMessage(`Error: ${err.message}`);
+        }
+    }
+
     // Fungsi Baru: Tambah Rilis Unduhan Aplikasi
     async function createDownload(e) {
         e.preventDefault();
@@ -131,6 +153,16 @@ export default function AdminDashboard() {
             (l.whatsapp && l.whatsapp.toLowerCase().includes(query)) ||
             (l.created_at && l.created_at.includes(query)) ||
             (l.expires_at && l.expires_at.includes(query))
+        );
+    });
+
+    // Logika Filter Kupon Baru
+    const filteredCoupons = coupons.filter((c) => {
+        const query = couponSearchQuery.toLowerCase();
+        return (
+            (c.code && c.code.toLowerCase().includes(query)) ||
+            (c.app_id && c.app_id.toLowerCase().includes(query)) ||
+            (c.discount_type && c.discount_type.toLowerCase().includes(query))
         );
     });
 
@@ -262,13 +294,25 @@ export default function AdminDashboard() {
                         <button type="submit">Buat</button>
                     </form>
 
-                    <h3>Daftar Kupon</h3>
+                    {/* Fitur Baru: Kolom Filter Pencarian Kupon */}
+                    <div style={{ marginBottom: 16 }}>
+                        <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 6 }}>🔍 Cari Kupon:</label>
+                        <input 
+                            type="text" 
+                            placeholder="Ketik kode kupon, app id, atau jenis diskon..." 
+                            value={couponSearchQuery}
+                            onChange={(e) => setCouponSearchQuery(e.target.value)}
+                            style={{ width: '100%', padding: 10, boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: 6 }}
+                        />
+                    </div>
+
+                    <h3>Daftar Kupon ({filteredCoupons.length})</h3>
                     <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '100%', fontSize: 13 }}>
                         <thead>
-                            <tr style={{ background: '#f3f4f6' }}><th>Code</th><th>App</th><th>Type</th><th>Value</th><th>Used/Max</th><th>Expires</th></tr>
+                            <tr style={{ background: '#f3f4f6' }}><th>Code</th><th>App</th><th>Type</th><th>Value</th><th>Used/Max</th><th>Expires</th><th>Aksi</th></tr>
                         </thead>
                         <tbody>
-                            {coupons.map((c) => (
+                            {filteredCoupons.map((c) => (
                                 <tr key={c.id}>
                                     <td style={{ fontWeight: 'bold' }}>{c.code}</td>
                                     <td>{c.app_id}</td>
@@ -276,6 +320,12 @@ export default function AdminDashboard() {
                                     <td>{c.discount_type === 'free_trial' ? `${c.trial_days}d` : c.discount_value}</td>
                                     <td>{c.used_count}/{c.max_uses}</td>
                                     <td>{c.expires_at ? new Date(c.expires_at).toLocaleDateString('id-ID') : '-'}</td>
+                                    {/* Fitur Baru: Kolom Tombol Hapus Kupon */}
+                                    <td>
+                                        <button onClick={() => deleteCoupon(c.id, c.code)} style={{ color: '#dc2626', fontWeight: 'bold', cursor: 'pointer' }}>
+                                            Hapus 🗑
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
