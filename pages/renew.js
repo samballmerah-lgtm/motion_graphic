@@ -5,6 +5,9 @@ import Head from 'next/head';
 import Script from 'next/script';
 
 const APP_ID = 'certgenpro';
+const WHATSAPP_NUMBER = '6289627312600';
+const WHATSAPP_DISPLAY = '0896-2731-2600';
+const WHATSAPP_LINK = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
 export default function Renew() {
     const [form, setForm] = useState({ email: '', whatsapp: '', package_type: 'yearly', coupon_code: '' });
@@ -82,6 +85,17 @@ export default function Renew() {
                         <span style={badgeStyle}>PAKET AKTIVASI PREMIUM</span>
                         <h1 style={titleStyle}>Pembelian Lisensi SVG Motion</h1>
                         <p style={subtitleStyle}>Pilih durasi paket lisensi yang sesuai dengan kebutuhan produksi video Anda.</p>
+                        <p style={{ marginTop: 10, fontSize: 12, color: '#64748b' }}>
+                            Ada kendala perpanjangan lisensi?{' '}
+                            <a
+                                href={WHATSAPP_LINK('Halo Admin, saya butuh bantuan untuk perpanjangan (renew) lisensi SVG Motion Studio.')}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: '#22c55e', fontWeight: 'bold', textDecoration: 'none' }}
+                            >
+                                💬 Chat Admin ({WHATSAPP_DISPLAY})
+                            </a>
+                        </p>
                     </div>
 
                     {/* Grid Pilihan Paket */}
@@ -153,6 +167,18 @@ export default function Renew() {
                     </form>
 
                     {message && <p style={messageStyle}>{message}</p>}
+
+                    <p style={{ textAlign: 'center', fontSize: 12, color: '#64748b', marginTop: 16 }}>
+                        Butuh bantuan proses pembayaran?{' '}
+                        <a
+                            href={WHATSAPP_LINK('Halo Admin, saya butuh bantuan proses pembayaran renew SVG Motion Studio.')}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: '#22c55e', fontWeight: 'bold', textDecoration: 'none' }}
+                        >
+                            💬 Chat Admin via WhatsApp
+                        </a>
+                    </p>
                 </main>
             </div>
         </>

@@ -5,6 +5,9 @@ import Head from 'next/head';
 import Script from 'next/script';
 
 const APP_ID = 'certgenpro';
+const WHATSAPP_NUMBER = '6289627312600';
+const WHATSAPP_DISPLAY = '0896-2731-2600';
+const WHATSAPP_LINK = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
 /* =========================================================================
    DESIGN TOKENS — tema sama dengan file referensi (dark, accent hijau)
@@ -63,6 +66,16 @@ const FEATURES = [
         title: 'Auto Metadata CSV: Title & ATM Tag',
         desc: 'Masukkan keyword hasil riset, sistem otomatis menyusun title dan tag sesuai kaidah metadata microstock — sehingga tinggal upload, tanpa isi manual satu-satu.',
     },
+    {
+        icon: '🤖',
+        title: 'Paket Prompt AI Siap Pakai untuk Generate Script SVG',
+        desc: 'Kami sertakan kumpulan prompt AI yang sudah teruji untuk menghasilkan script SVG berkualitas dari video referensi — tinggal salin-tempel ke layanan AI pilihanmu, tanpa perlu meracik prompt sendiri dari nol.',
+    },
+    {
+        icon: '📀',
+        title: 'Output 4K Siap Upload Tanpa Upscale',
+        desc: 'Render langsung dalam resolusi 4K native yang memenuhi standar Adobe Stock & Shutterstock, tanpa perlu proses upscale tambahan sebelum diunggah.',
+    },
 ];
 
 const GOOD_FOR = [
@@ -105,11 +118,37 @@ const FAQS = [
     { q: 'Berapa lama waktu untuk generate banyak motion graphic?', a: 'Dengan fitur Generate Batch, kamu bisa memproses 50 lebih motion graphic dalam waktu sekitar 2 jam, tergantung spesifikasi laptop atau PC yang digunakan.' },
     { q: 'Apakah lisensi ini termasuk update aplikasi ke depannya?', a: 'Ya, member mendapat free update aplikasi tanpa biaya tambahan selama masa lisensi aktif.' },
     { q: 'Kalau saya butuh bantuan, ke mana harus bertanya?', a: 'Setiap member mendapat akses ke Forum WhatsApp khusus untuk diskusi, tanya-jawab seputar aplikasi, dan berbagi tips sesama microstocker.' },
+    { q: 'Apa itu paket Prompt AI untuk generate script SVG?', a: 'Kumpulan prompt siap pakai yang sudah teruji untuk menghasilkan script SVG dari video referensi. Tinggal salin-tempel ke layanan AI (mis. Google AI Studio) yang kamu pakai, tanpa perlu meracik prompt sendiri.' },
+    { q: 'Sistem operasi apa saja yang didukung?', a: 'Saat ini aplikasi hanya diuji dan berjalan baik di Windows 10 (64-bit) dan Windows 11 (64-bit). Sistem operasi lain seperti macOS atau Linux belum didukung.' },
+    { q: 'Berapa RAM dan ruang penyimpanan yang dibutuhkan?', a: 'Disarankan RAM 12 GB ke atas (minimal 8 GB) dengan ruang kosong minimal 5 GB. Laptop atau PC standar perkantoran pada umumnya sudah bisa menjalankan aplikasi ini.' },
+    { q: 'Apakah wajib punya GPU / kartu grafis khusus?', a: 'Tidak wajib. Aplikasi tetap bisa dijalankan tanpa GPU khusus, meski performa render bisa lebih cepat pada perangkat dengan GPU.' },
+    { q: 'Muncul peringatan Windows SmartScreen saat pertama kali membuka aplikasi, apa yang harus dilakukan?', a: 'Ini wajar karena aplikasi belum memakai Code Signing Certificate. Klik "More info", lalu klik "Run anyway". Langkah ini hanya perlu dilakukan sekali di setiap perangkat.' },
+    { q: 'Bagaimana cara klaim garansi uang kembali?', a: 'Hubungi Admin via WhatsApp maksimal 3 hari kalender sejak pembelian. Tim kami akan membantu troubleshooting terlebih dahulu; jika aplikasi memang tidak bisa berjalan di perangkatmu, dana akan dikembalikan sesuai ketentuan.' },
+    { q: 'Apakah lisensi bisa dipindah ke perangkat lain?', a: 'Setiap lisensi hanya berlaku untuk 1 perangkat dan bersifat Personal Use, tidak dapat dipindahkan atau dibagikan tanpa izin dari Imagine Studio.' },
+    { q: 'Bagaimana cara memperpanjang (renew) lisensi setelah masa aktif habis?', a: 'Kamu bisa memperpanjang kapan saja melalui halaman renew, pilih durasi paket yang diinginkan, lalu selesaikan pembayaran seperti pembelian pertama.' },
 ];
 
-/* =========================================================================
-   HOOKS
-   ========================================================================= */
+const REQUIREMENTS = [
+    { icon: '🖥️', label: 'Sistem Operasi', value: 'Windows 10 (64-bit) & Windows 11 (64-bit)', note: 'Belum mendukung macOS atau Linux.' },
+    { icon: '🧠', label: 'RAM', value: 'Minimal 8 GB (disarankan 12 GB ke atas)', note: 'Laptop/PC kantoran biasa umumnya sudah cukup.' },
+    { icon: '💾', label: 'Ruang Penyimpanan', value: 'Minimal 5 GB ruang kosong', note: 'Untuk aplikasi, cache render, dan file output.' },
+    { icon: '🎮', label: 'GPU (Kartu Grafis)', value: 'Tidak wajib', note: 'Aplikasi tetap bisa berjalan tanpa GPU khusus / kartu grafis terpisah.' },
+];
+
+const GUARANTEE_POINTS = [
+    'Garansi uang kembali 100% selama 3 hari kalender sejak tanggal pembelian.',
+    'Berlaku apabila aplikasi benar-benar tidak dapat dijalankan/digunakan di perangkatmu, setelah mengikuti petunjuk instalasi.',
+    'Tim kami akan membantu troubleshooting terlebih dahulu sebelum proses refund diproses.',
+];
+const GUARANTEE_EXCEPTIONS = [
+    'Pengajuan sudah melewati 3 hari sejak tanggal pembelian.',
+    'Hanya karena berubah pikiran setelah membeli.',
+    'Tidak menyukai fitur, tampilan, atau cara kerja aplikasi.',
+    'Kendala berasal dari layanan AI pihak ketiga (mis. perubahan kebijakan Google AI Studio).',
+    'Kendala dari konfigurasi perangkat, antivirus, atau software pihak ketiga di luar kendali kami.',
+];
+
+
 
 function useReveal() {
     const ref = useRef(null);
@@ -298,9 +337,11 @@ export default function Home() {
                     <ProblemSolutionSection />
                     <FeaturesSection />
                     <GoodForSection />
+                    <RequirementsSection />
                     <DemoSection />
                     <TestimonialsSection />
                     <BonusSection />
+                    <GuaranteeSection scrollTo={scrollTo} />
                     <PurchaseSection
                         form={form}
                         setForm={setForm}
@@ -580,6 +621,39 @@ function GoodForSection() {
 }
 
 /* =========================================================================
+   SYSTEM REQUIREMENTS
+   ========================================================================= */
+
+function RequirementsSection() {
+    const [ref, visible] = useReveal();
+    return (
+        <section id="requirement" ref={ref} style={fadeStyle(visible, { padding: '80px 20px' })}>
+            <div style={{ maxWidth: MAXW, margin: '0 auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: 40 }}>
+                    <h2 style={h2Style}>Perangkat yang dibutuhkan</h2>
+                    <p style={{ color: COLOR.textMuted, maxWidth: 560, margin: '0 auto' }}>
+                        Aplikasi ini ringan dan didesain untuk berjalan di laptop/PC standar perkantoran — tidak perlu spek tinggi.
+                    </p>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 18 }}>
+                    {REQUIREMENTS.map((r) => (
+                        <div key={r.label} style={{ background: COLOR.bgCard, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 22, textAlign: 'center' }}>
+                            <div style={{ fontSize: 26, marginBottom: 10 }}>{r.icon}</div>
+                            <div style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 13, color: COLOR.textMuted, marginBottom: 6 }}>{r.label}</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: COLOR.text, marginBottom: 6 }}>{r.value}</div>
+                            <div style={{ fontSize: 11.5, color: COLOR.textFaint, lineHeight: 1.5 }}>{r.note}</div>
+                        </div>
+                    ))}
+                </div>
+                <p style={{ textAlign: 'center', color: COLOR.textFaint, fontSize: 12, marginTop: 24, lineHeight: 1.7, maxWidth: 640, marginLeft: 'auto', marginRight: 'auto' }}>
+                    <strong style={{ color: COLOR.textMuted }}>Disclaimer:</strong> Aplikasi ini memerlukan script hasil generate AI (mis. Google AI Studio atau layanan AI kompatibel lainnya) agar dapat digunakan. Imagine Studio tidak berafiliasi dengan penyedia layanan AI pihak ketiga dan tidak bertanggung jawab atas perubahan kebijakan, biaya, atau penghentian layanan tersebut. Seluruh hasil video yang dihasilkan sepenuhnya menjadi tanggung jawab pengguna.
+                </p>
+            </div>
+        </section>
+    );
+}
+
+/* =========================================================================
    DEMO — CAROUSEL SCREENSHOT + VIDEO EMBED (dummy)
    ========================================================================= */
 
@@ -749,6 +823,72 @@ function BonusSection() {
 }
 
 /* =========================================================================
+   GARANSI UANG KEMBALI
+   ========================================================================= */
+
+function GuaranteeSection({ scrollTo }) {
+    const [ref, visible] = useReveal();
+    return (
+        <section id="garansi" ref={ref} style={fadeStyle(visible, { padding: '80px 20px', background: COLOR.bgElevated })}>
+            <div style={{ maxWidth: 820, margin: '0 auto' }}>
+                <div
+                    style={{
+                        background: 'rgba(16,185,129,0.06)', border: `1px solid ${COLOR.borderAccent}`, borderRadius: 18,
+                        padding: '36px 28px', display: 'grid', gridTemplateColumns: '1fr', gap: 28,
+                    }}
+                    className="two-col-equal"
+                >
+                    <div>
+                        <span style={{ fontSize: 30 }}>🛡️</span>
+                        <h2 style={{ ...h2Style, textAlign: 'left', marginTop: 10 }}>Garansi Uang Kembali 3 Hari</h2>
+                        <p style={{ color: COLOR.textMuted, lineHeight: 1.75, fontSize: 13.5, marginBottom: 16 }}>
+                            Belanja tenang. Kalau aplikasi benar-benar tidak bisa dijalankan di perangkatmu setelah mengikuti
+                            petunjuk instalasi, kami bantu troubleshoot dulu — dan dana bisa dikembalikan sesuai ketentuan.
+                        </p>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {GUARANTEE_POINTS.map((p) => (
+                                <li key={p} style={{ fontSize: 13, color: COLOR.text, display: 'flex', gap: 8, lineHeight: 1.6 }}>
+                                    <span style={{ color: COLOR.accent, flexShrink: 0 }}>✓</span> {p}
+                                </li>
+                            ))}
+                        </ul>
+                        <a
+                            href={WHATSAPP_LINK('Halo Admin, saya ingin bertanya soal garansi uang kembali SVG Motion Studio.')}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 8, color: '#22c55e', fontWeight: 700,
+                                fontSize: 13, textDecoration: 'none',
+                            }}
+                        >
+                            💬 Tanya Admin soal garansi via WhatsApp ({WHATSAPP_DISPLAY})
+                        </a>
+                    </div>
+                    <div>
+                        <h3 style={{ fontFamily: FONT_HEAD, fontSize: 13.5, color: '#f87171', marginBottom: 12 }}>Garansi tidak berlaku apabila:</h3>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {GUARANTEE_EXCEPTIONS.map((p) => (
+                                <li key={p} style={{ fontSize: 12.5, color: COLOR.textMuted, display: 'flex', gap: 8, lineHeight: 1.6 }}>
+                                    <span style={{ color: '#f87171', flexShrink: 0 }}>✕</span> {p}
+                                </li>
+                            ))}
+                        </ul>
+                        <p style={{ fontSize: 11.5, color: COLOR.textFaint, marginTop: 14, lineHeight: 1.6 }}>
+                            Detail lengkap lihat halaman <a onClick={() => window.open('/terms', '_blank')} style={{ color: COLOR.accent, cursor: 'pointer' }}>Syarat &amp; Ketentuan</a>.
+                        </p>
+                    </div>
+                </div>
+                <style jsx>{`
+                    @media (min-width: 700px) {
+                        .two-col-equal { grid-template-columns: 1.1fr 0.9fr !important; }
+                    }
+                `}</style>
+            </div>
+        </section>
+    );
+}
+
+/* =========================================================================
    PURCHASE SECTION — FORM & LOGIC PEMBELIAN ASLI (tidak diubah)
    ========================================================================= */
 
@@ -821,6 +961,18 @@ function PurchaseSection({ form, setForm, loading, message, handleSubmit }) {
                     </form>
 
                     {message && <p style={messageStyle}>{message}</p>}
+
+                    <p style={{ textAlign: 'center', fontSize: 12, color: COLOR.textFaint, marginTop: 18 }}>
+                        Ada pertanyaan sebelum membeli?{' '}
+                        <a
+                            href={WHATSAPP_LINK('Halo Admin, saya ingin bertanya tentang SVG Motion Studio sebelum membeli.')}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: '#22c55e', fontWeight: 700, textDecoration: 'none' }}
+                        >
+                            💬 Chat Admin via WhatsApp
+                        </a>
+                    </p>
                 </main>
             </div>
         </section>
@@ -907,8 +1059,15 @@ function Footer() {
                 <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                     <a href="#" style={{ color: COLOR.textFaint }}>Tentang</a>
                     <a href="#" style={{ color: COLOR.textFaint }}>Kebijakan Privasi</a>
-                    <a href="#" style={{ color: COLOR.textFaint }}>Syarat & Ketentuan</a>
-                    <a href="#" style={{ color: COLOR.textFaint }}>Kontak</a>
+                    <a href="/terms" style={{ color: COLOR.textFaint }}>Syarat & Ketentuan</a>
+                    <a
+                        href={WHATSAPP_LINK('Halo Admin, saya ingin bertanya tentang SVG Motion Studio.')}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: COLOR.textFaint }}
+                    >
+                        Kontak ({WHATSAPP_DISPLAY})
+                    </a>
                 </div>
                 <div>© {new Date().getFullYear()} SVG Motion Studio. Semua hak dilindungi.</div>
             </div>
