@@ -147,10 +147,10 @@ const HOW_IT_WORKS = [
 ];
 
 const SCREENSHOTS = [
-    { label: 'Dashboard Generate Batch', caption: 'Atur banyak project sekaligus dan pantau progres render secara real-time.' },
-    { label: 'Import Script dari AI Studio', caption: 'Tempel hasil Script SVG + JSON dari AI Studio, langsung tervalidasi dan siap dirender.' },
-    { label: 'Pilihan Output & Background', caption: '4K/2K/HD, MOV/MP4, alpha channel, solid color, atau no background.' },
-    { label: 'Metadata Title & ATM Tag', caption: 'Masukkan keyword riset, title dan tag tersusun otomatis siap upload.' },
+    { label: 'Dashboard Generate Batch', caption: 'Atur banyak project sekaligus dan pantau progres render secara real-time.', image: '/screenshots/1_dashboard.png' },
+    { label: 'Import Script dari AI Studio', caption: 'Tempel hasil Script SVG + JSON dari AI Studio, langsung tervalidasi dan siap dirender.', image: '/screenshots/2_copas_script.png' },
+    { label: 'Pilihan Output & Background', caption: '4K/2K/HD, MOV/MP4, alpha channel, solid color, atau no background.', image: '/screenshots/3_render_setting.png' },
+    { label: 'Metadata Title & ATM Tag', caption: 'Masukkan keyword riset, title dan tag tersusun otomatis siap upload.', image: '/screenshots/4_metadata.png' },
 ];
 
 const TESTIMONIALS = [
