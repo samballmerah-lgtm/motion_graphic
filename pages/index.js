@@ -9,6 +9,11 @@ const WHATSAPP_NUMBER = '6289627312600';
 const WHATSAPP_DISPLAY = '0896-2731-2600';
 const WHATSAPP_LINK = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
+// Isi dengan URL embed video demo kalau sudah siap, misal:
+// 'https://www.youtube.com/embed/VIDEO_ID' atau 'https://player.vimeo.com/video/VIDEO_ID'
+// Biarkan string kosong ('') untuk tetap menampilkan placeholder "segera hadir".
+const DEMO_VIDEO_EMBED_URL = '';
+
 /* =========================================================================
    DESIGN TOKENS — tema sama dengan file referensi (dark, accent hijau)
    ========================================================================= */
@@ -147,10 +152,10 @@ const HOW_IT_WORKS = [
 ];
 
 const SCREENSHOTS = [
-    { label: 'Dashboard Generate Batch', caption: 'Atur banyak project sekaligus dan pantau progres render secara real-time.', image: '/screenshots/1_dasboard.png' },
+    { label: 'Dashboard Generate Batch', caption: 'Generate Script SVG + Metadata JSON via AI Studio.', image: '/screenshots/1_dasboard.png' },
     { label: 'Import Script dari AI Studio', caption: 'Tempel hasil Script SVG + JSON dari AI Studio, langsung tervalidasi dan siap dirender.', image: '/screenshots/2_copas_script.png' },
     { label: 'Pilihan Output & Background', caption: '4K/2K/HD, MOV/MP4, alpha channel, solid color, atau no background.', image: '/screenshots/3_render_setting.png' },
-    { label: 'Metadata Title & ATM Tag', caption: 'Masukkan keyword riset, title dan tag tersusun otomatis siap upload.', image: '/screenshots/4_metadata.png' },
+    { label: 'Metadata Title & ATM Tag', caption: 'Hasil render 5 Motion Graphic + File CSV Metadata siap upload.', image: '/screenshots/4_metadata.png' },
 ];
 
 const TESTIMONIALS = [
@@ -799,27 +804,43 @@ function DemoSection() {
                         </div>
                     </div>
 
-                    {/* Video embed placeholder */}
+                    {/* Video embed */}
                     <div>
-                        <div
-                            style={{
-                                background: COLOR.bgCard, border: `1px solid ${COLOR.border}`, borderRadius: 14,
-                                aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                flexDirection: 'column', gap: 10,
-                            }}
-                        >
-                            {/* TODO: ganti div ini dengan <iframe> video (YouTube/Vimeo) saat link tersedia */}
+                        {DEMO_VIDEO_EMBED_URL ? (
                             <div
                                 style={{
-                                    width: 56, height: 56, borderRadius: '50%', background: COLOR.accent,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#fff',
+                                    border: `1px solid ${COLOR.border}`, borderRadius: 14,
+                                    aspectRatio: '16/9', overflow: 'hidden',
                                 }}
-                                aria-label="Putar video demo"
                             >
-                                ▶
+                                <iframe
+                                    src={DEMO_VIDEO_EMBED_URL}
+                                    title="Video Demo SVG Motion Studio"
+                                    style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+                                    allow="autoplay; encrypted-media; picture-in-picture"
+                                    allowFullScreen
+                                />
                             </div>
-                            <span style={{ fontSize: 13, color: COLOR.textMuted }}>Video Demo Aplikasi (segera hadir)</span>
-                        </div>
+                        ) : (
+                            <div
+                                style={{
+                                    background: COLOR.bgCard, border: `1px solid ${COLOR.border}`, borderRadius: 14,
+                                    aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    flexDirection: 'column', gap: 10,
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        width: 56, height: 56, borderRadius: '50%', background: COLOR.accent,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#fff',
+                                    }}
+                                    aria-label="Putar video demo"
+                                >
+                                    ▶
+                                </div>
+                                <span style={{ fontSize: 13, color: COLOR.textMuted }}>Video Demo Aplikasi (segera hadir)</span>
+                            </div>
+                        )}
                         <p style={{ textAlign: 'center', color: COLOR.textMuted, fontSize: 13, marginTop: 12 }}>
                             Lihat proses generate motion graphic dari awal sampai siap upload.
                         </p>
@@ -854,7 +875,7 @@ function TestimonialsSection() {
             <div style={{ maxWidth: MAXW, margin: '0 auto' }}>
                 <div style={{ textAlign: 'center', marginBottom: 44 }}>
                     <h2 style={h2Style}>Apa kata member kami</h2>
-                    <p style={{ color: COLOR.textMuted }}>Testimoni dummy — siap diganti dengan testimoni asli.</p>
+                    <p style={{ color: COLOR.textMuted }}></p>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20 }}>
                     {TESTIMONIALS.map((t) => (

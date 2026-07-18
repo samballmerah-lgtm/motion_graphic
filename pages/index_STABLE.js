@@ -855,7 +855,7 @@ function TestimonialsSection() {
             <div style={{ maxWidth: MAXW, margin: '0 auto' }}>
                 <div style={{ textAlign: 'center', marginBottom: 44 }}>
                     <h2 style={h2Style}>Apa kata member kami</h2>
-                    <p style={{ color: COLOR.textMuted }}>Testimoni dummy — siap diganti dengan testimoni asli.</p>
+                    <p style={{ color: COLOR.textMuted }}></p>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20 }}>
                     {TESTIMONIALS.map((t) => (
