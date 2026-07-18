@@ -12,7 +12,7 @@ const WHATSAPP_LINK = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeUR
 // Isi dengan URL embed video demo kalau sudah siap, misal:
 // 'https://www.youtube.com/embed/VIDEO_ID' atau 'https://player.vimeo.com/video/VIDEO_ID'
 // Biarkan string kosong ('') untuk tetap menampilkan placeholder "segera hadir".
-const DEMO_VIDEO_EMBED_URL = '';
+const DEMO_VIDEO_EMBED_URL = 'https://www.youtube.com/embed/EwL1EHv2Zwg';
 
 /* =========================================================================
    DESIGN TOKENS — tema sama dengan file referensi (dark, accent hijau)
