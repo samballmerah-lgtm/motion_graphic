@@ -38,8 +38,8 @@ const MAXW = 1180;
 const FEATURES = [
     {
         icon: '🎬',
-        title: 'Auto-Generate Script SVG dari Video Referensi',
-        desc: 'Tinggal masukkan video referensi, aplikasi otomatis membuatkan script SVG-nya — sehingga kamu tidak perlu bisa After Effects atau ilmu animasi sama sekali.',
+        title: 'Generate Script SVG + JSON dari Video Referensi via AI Studio',
+        desc: 'Pakai Paket Prompt AI dari kami di AI Studio untuk mengubah video referensi jadi Script SVG + JSON animasi — tinggal import ke aplikasi, tanpa perlu bisa After Effects atau ilmu animasi sama sekali.',
     },
     {
         icon: '⚡',
@@ -68,8 +68,8 @@ const FEATURES = [
     },
     {
         icon: '🤖',
-        title: 'Paket Prompt AI Siap Pakai untuk Generate Script SVG',
-        desc: 'Kami sertakan kumpulan prompt AI yang sudah teruji untuk menghasilkan script SVG berkualitas dari video referensi — tinggal salin-tempel ke layanan AI pilihanmu, tanpa perlu meracik prompt sendiri dari nol.',
+        title: 'Paket Prompt AI Siap Pakai untuk Generate Script SVG + JSON',
+        desc: 'Kami sertakan kumpulan prompt AI yang sudah teruji untuk menghasilkan Script SVG + JSON animasi berkualitas dari video referensi di AI Studio — tinggal salin-tempel, tanpa perlu meracik prompt sendiri dari nol.',
     },
     {
         icon: '📀',
@@ -121,34 +121,34 @@ const BONUSES = [
 const HOW_IT_WORKS = [
     {
         step: '01',
-        title: 'Dapatkan Script Animasi',
-        desc: 'Tulis instruksi gerakan dalam bahasa sehari-hari ke AI gratis (mis. ChatGPT/Claude), atau pakai Paket Prompt AI siap pakai dari kami — tidak perlu bisa coding.',
+        title: 'Generate Script SVG + JSON di AI Studio',
+        desc: 'Masukkan video referensi ke AI Studio, lalu pakai Paket Prompt AI siap pakai dari kami untuk menghasilkan Script SVG + JSON animasinya — tidak perlu bisa coding maupun ilmu animasi.',
     },
     {
         step: '02',
-        title: 'Siapkan SVG & Metadata',
-        desc: 'Siapkan gambar SVG statis dengan ID elemen yang sesuai skrip animasi, plus keyword riset untuk metadata otomatis (opsional).',
+        title: 'Import Script ke SVG Motion App',
+        desc: 'Tempel atau upload hasil Script SVG + JSON dari AI Studio langsung ke aplikasi — tanpa perlu edit atau rapikan manual satu per satu.',
     },
     {
         step: '03',
-        title: 'Masukkan & Validasi',
-        desc: 'Tempel kode SVG dan script animasi (.txt/.js) ke aplikasi, klik "Validate All Packages" — thumbnail pratinjau langsung tampil untuk dikurasi.',
+        title: 'Validasi Script & Generate Preview',
+        desc: 'Klik "Validate All Packages" untuk mengecek script secara otomatis, lalu lihat thumbnail pratinjau tiap animasi untuk dikurasi sebelum render.',
     },
     {
         step: '04',
-        title: 'Atur Format & Render Batch',
-        desc: 'Pilih resolusi (HD/2K/4K), format (MP4/MOV), FPS, dan rasio (16:9/9:16), lalu klik "Start Batch Render" — sistem bekerja otomatis di latar belakang.',
+        title: 'Atur Pengaturan Output Render',
+        desc: 'Pilih resolusi (HD/2K/4K), format (MP4/MOV), FPS, rasio (16:9/9:16), dan background (transparan/solid) sesuai kebutuhan platform microstock-mu.',
     },
     {
         step: '05',
-        title: 'Unggah ke Microstock',
-        desc: 'Buka folder ekspor, unggah video beserta CSV metadata pendampingnya — tag dan judul sudah terisi otomatis, video siap dijual.',
+        title: 'Render Sekali Klik, Panen Puluhan Motion Graphic',
+        desc: 'Klik "Start Batch Render" dan biarkan aplikasi bekerja otomatis di latar belakang — hasilkan puluhan motion graphic sekaligus, lengkap dengan metadata CSV, siap diunggah ke Adobe Stock & Shutterstock.',
     },
 ];
 
 const SCREENSHOTS = [
     { label: 'Dashboard Generate Batch', caption: 'Atur banyak project sekaligus dan pantau progres render secara real-time.' },
-    { label: 'Auto Script SVG dari Video', caption: 'Upload video referensi, sistem otomatis membuatkan script SVG-nya.' },
+    { label: 'Import Script dari AI Studio', caption: 'Tempel hasil Script SVG + JSON dari AI Studio, langsung tervalidasi dan siap dirender.' },
     { label: 'Pilihan Output & Background', caption: '4K/2K/HD, MOV/MP4, alpha channel, solid color, atau no background.' },
     { label: 'Metadata Title & ATM Tag', caption: 'Masukkan keyword riset, title dan tag tersusun otomatis siap upload.' },
 ];
@@ -161,7 +161,7 @@ const TESTIMONIALS = [
 ];
 
 const FAQS = [
-    { q: 'Apakah saya perlu bisa After Effects atau animasi untuk pakai aplikasi ini?', a: 'Tidak perlu. Kamu cukup menyiapkan video referensi, lalu aplikasi akan otomatis membuat script SVG dan variasi animasinya untukmu.' },
+    { q: 'Apakah saya perlu bisa After Effects atau animasi untuk pakai aplikasi ini?', a: 'Tidak perlu. Kamu cukup menyiapkan video referensi, generate Script SVG + JSON-nya lewat AI Studio memakai Paket Prompt AI dari kami, lalu import ke aplikasi untuk divalidasi dan dirender otomatis.' },
     { q: 'Jenis animasi seperti apa yang cocok dibuat dengan aplikasi ini?', a: 'Paling cocok untuk animasi 2D sederhana dengan background color gradient atau solid. Aplikasi ini tidak dirancang untuk animasi yang sangat rumit, objek 3D, atau gaya realistis.' },
     { q: 'Format dan resolusi apa saja yang didukung?', a: 'Kamu bisa memilih output 4K, 2K, atau HD dalam format MOV maupun MP4, dengan pilihan background transparan (alpha channel), solid color, atau mengikuti desain SVG aslinya.' },
     { q: 'Berapa lama waktu untuk generate banyak motion graphic?', a: 'Dengan fitur Generate Batch, kamu bisa memproses 50 lebih motion graphic dalam waktu sekitar 2 jam, tergantung spesifikasi laptop atau PC yang digunakan.' },
@@ -647,9 +647,9 @@ function HowItWorksSection() {
         <section id="cara-kerja" ref={ref} style={fadeStyle(visible, { padding: '80px 20px' })}>
             <div style={{ maxWidth: MAXW, margin: '0 auto' }}>
                 <div style={{ textAlign: 'center', marginBottom: 44 }}>
-                    <h2 style={h2Style}>Dari video referensi jadi siap upload, cuma 5 langkah</h2>
+                    <h2 style={h2Style}>Dari Video Referensi Jadi Puluhan Motion Graphic Siap Upload, Cuma 5 Langkah</h2>
                     <p style={{ color: COLOR.textMuted, maxWidth: 560, margin: '0 auto' }}>
-                        Tidak ada proses manual yang ribet — cukup ikuti alurnya dan biarkan aplikasi bekerja secara batch di latar belakang.
+                        Generate script di AI Studio, import ke aplikasi, lalu biarkan SVG Motion Studio bekerja secara batch di latar belakang — tanpa proses manual yang ribet.
                     </p>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
