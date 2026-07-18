@@ -980,6 +980,53 @@ function GuaranteeSection({ scrollTo }) {
 }
 
 /* =========================================================================
+   COUNTDOWN PROMO (DUMMY) — badge harga coret & timer visual, tidak menyentuh
+   form, logic pembelian, atau harga asli yang dikirim ke server
+   ========================================================================= */
+
+function usePromoCountdown(durationMs = 60 * 60 * 1000) {
+    const [target, setTarget] = useState(() => Date.now() + durationMs);
+    const [remaining, setRemaining] = useState(durationMs);
+
+    useEffect(() => {
+        const tick = () => {
+            const diff = target - Date.now();
+            if (diff <= 0) {
+                // dummy: loop lagi ke 1 jam supaya banner tetap hidup
+                setTarget(Date.now() + durationMs);
+                setRemaining(durationMs);
+            } else {
+                setRemaining(diff);
+            }
+        };
+        const id = setInterval(tick, 1000);
+        return () => clearInterval(id);
+    }, [target, durationMs]);
+
+    const totalSec = Math.max(0, Math.floor(remaining / 1000));
+    const hh = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+    const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+    const ss = String(totalSec % 60).padStart(2, '0');
+    return `${hh}:${mm}:${ss}`;
+}
+
+function PromoCountdownBadge() {
+    const timeLeft = usePromoCountdown();
+    return (
+        <div
+            style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                background: 'rgba(245,158,11,0.1)', border: `1px solid ${COLOR.warn}`, borderRadius: 8,
+                padding: '8px 12px', marginTop: 12, fontSize: 12.5, color: COLOR.warn, fontWeight: 700,
+            }}
+        >
+            <span>⏰ Harga promo kembali ke normal dalam</span>
+            <span style={{ fontFamily: FONT_HEAD, fontVariantNumeric: 'tabular-nums' }}>{timeLeft}</span>
+        </div>
+    );
+}
+
+/* =========================================================================
    PURCHASE SECTION — FORM & LOGIC PEMBELIAN ASLI (tidak diubah)
    ========================================================================= */
 
@@ -1000,12 +1047,14 @@ function PurchaseSection({ form, setForm, loading, message, handleSubmit }) {
                         <h3 style={{ margin: 0, color: '#10b981', fontSize: 14, letterSpacing: '0.05em' }}>REKOMENDASI TERBAIK</h3>
                         <h2 style={{ margin: '8px 0', fontSize: 24, fontWeight: 'bold' }}>Paket Lisensi Tahunan</h2>
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, margin: '12px 0' }}>
+                            <span style={{ fontSize: 15, color: COLOR.textFaint, textDecoration: 'line-through' }}>Rp 350.000</span>
                             <span style={{ fontSize: 32, fontWeight: 'bold', color: '#fff' }}>Rp 149.000</span>
                             <span style={{ color: '#94a3b8', fontSize: 14 }}>/ tahun</span>
                         </div>
                         <p style={{ color: '#94a3b8', fontSize: 13, margin: 0, lineHeight: '1.4' }}>
                             Akses penuh ke semua fitur premium, akselerasi GPU (NVENC/VTB), optimasi memori, serta ekspor CSV Adobe Stock & Shutterstock tanpa batas.
                         </p>
+                        <PromoCountdownBadge />
                     </div>
 
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
