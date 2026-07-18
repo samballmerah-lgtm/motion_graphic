@@ -76,6 +76,26 @@ const FEATURES = [
         title: 'Output 4K Siap Upload Tanpa Upscale',
         desc: 'Render langsung dalam resolusi 4K native yang memenuhi standar Adobe Stock & Shutterstock, tanpa perlu proses upscale tambahan sebelum diunggah.',
     },
+    {
+        icon: '📱',
+        title: 'Multi-Rasio Sekali Klik: Landscape 16:9 & Vertical 9:16',
+        desc: 'Ekspor rasio lanskap standar microstock maupun rasio vertikal untuk TikTok, Reels, dan Shorts hanya dengan sekali klik dari aset yang sama.',
+    },
+    {
+        icon: '🎞️',
+        title: 'Animasi Mulus Bebas Frame-Drop',
+        desc: 'Sistem mengabadikan gambar frame-by-frame secara presisi sebelum digabungkan menjadi video, sehingga hasil animasi tetap mulus di resolusi tinggi (HD, 2K, hingga 4K).',
+    },
+    {
+        icon: '🎲',
+        title: 'Pengacak Folder Anti-Similar Rejection',
+        desc: 'Fitur opsional untuk mengacak variasi hasil ekspor agar tidak masuk folder yang sama, meminimalisasi risiko penolakan massal akibat kemiripan konten di agensi.',
+    },
+    {
+        icon: '💸',
+        title: 'Tanpa API Berbayar — 100% Berjalan Lokal',
+        desc: 'Proses render sepenuhnya berjalan di komputer kamu sendiri, tanpa biaya langganan API pihak ketiga atau server eksternal tambahan.',
+    },
 ];
 
 const GOOD_FOR = [
@@ -83,6 +103,7 @@ const GOOD_FOR = [
     'Background color gradient / solid',
     'Motion graphic looping untuk B-roll',
     'Produksi cepat dalam jumlah besar',
+    'Ekspor multi-rasio: landscape 16:9 & vertical 9:16',
 ];
 const NOT_FOR = [
     'Animasi yang sangat rumit / kompleks',
@@ -95,6 +116,34 @@ const BONUSES = [
     { icon: '🔍', title: 'Panduan Riset Keyword Adobe Stock', desc: 'Cara step-by-step mencari celah keyword yang masih jarang pesaingnya.' },
     { icon: '🔄', title: 'Free Update Aplikasi', desc: 'Semua pembaruan fitur & perbaikan aplikasi ke depannya, tanpa biaya tambahan.' },
     { icon: '💬', title: 'Forum WhatsApp Member', desc: 'Ruang diskusi khusus member untuk tanya-jawab, tips, dan update terbaru.' },
+];
+
+const HOW_IT_WORKS = [
+    {
+        step: '01',
+        title: 'Dapatkan Script Animasi',
+        desc: 'Tulis instruksi gerakan dalam bahasa sehari-hari ke AI gratis (mis. ChatGPT/Claude), atau pakai Paket Prompt AI siap pakai dari kami — tidak perlu bisa coding.',
+    },
+    {
+        step: '02',
+        title: 'Siapkan SVG & Metadata',
+        desc: 'Siapkan gambar SVG statis dengan ID elemen yang sesuai skrip animasi, plus keyword riset untuk metadata otomatis (opsional).',
+    },
+    {
+        step: '03',
+        title: 'Masukkan & Validasi',
+        desc: 'Tempel kode SVG dan script animasi (.txt/.js) ke aplikasi, klik "Validate All Packages" — thumbnail pratinjau langsung tampil untuk dikurasi.',
+    },
+    {
+        step: '04',
+        title: 'Atur Format & Render Batch',
+        desc: 'Pilih resolusi (HD/2K/4K), format (MP4/MOV), FPS, dan rasio (16:9/9:16), lalu klik "Start Batch Render" — sistem bekerja otomatis di latar belakang.',
+    },
+    {
+        step: '05',
+        title: 'Unggah ke Microstock',
+        desc: 'Buka folder ekspor, unggah video beserta CSV metadata pendampingnya — tag dan judul sudah terisi otomatis, video siap dijual.',
+    },
 ];
 
 const SCREENSHOTS = [
@@ -126,6 +175,8 @@ const FAQS = [
     { q: 'Bagaimana cara klaim garansi uang kembali?', a: 'Hubungi Admin via WhatsApp maksimal 3 hari kalender sejak pembelian. Tim kami akan membantu troubleshooting terlebih dahulu; jika aplikasi memang tidak bisa berjalan di perangkatmu, dana akan dikembalikan sesuai ketentuan.' },
     { q: 'Apakah lisensi bisa dipindah ke perangkat lain?', a: 'Setiap lisensi hanya berlaku untuk 1 perangkat dan bersifat Personal Use, tidak dapat dipindahkan atau dibagikan tanpa izin dari Imagine Studio.' },
     { q: 'Bagaimana cara memperpanjang (renew) lisensi setelah masa aktif habis?', a: 'Kamu bisa memperpanjang kapan saja melalui halaman renew, pilih durasi paket yang diinginkan, lalu selesaikan pembayaran seperti pembelian pertama.' },
+    { q: 'Apakah bisa ekspor video vertikal untuk TikTok/Reels/Shorts?', a: 'Bisa. Dari satu aset SVG yang sama, kamu tinggal pilih rasio landscape 16:9 atau vertical 9:16 saat konfigurasi render, tanpa perlu desain ulang.' },
+    { q: 'Bagaimana cara meminimalisasi risiko penolakan karena konten dianggap mirip?', a: 'Aktifkan fitur pengacak folder saat batch render, sehingga variasi hasil ekspor tersebar dan tidak diunggah dalam satu folder yang sama ke agensi.' },
 ];
 
 const REQUIREMENTS = [
@@ -254,7 +305,9 @@ export default function Home() {
             }
 
             if (data.free_trial) {
-                setMessage(`Trial berhasil! Kode lisensi Anda: ${data.license_key} (sudah dikirim ke email/WA)`);
+                // Kupon berhasil -> arahkan ke halaman thankyou yang sama dengan alur pembayaran
+                // biasa, supaya lisensi & link download tampil jelas seperti pembelian tanpa kupon.
+                window.location.href = `/thankyou?license_key=${data.license_key}`;
                 return;
             }
 
@@ -294,9 +347,9 @@ export default function Home() {
                 <title>SVG Motion Studio v2 — Motion Graphic Microstock Tanpa After Effects</title>
                 <meta
                     name="description"
-                    content="Generate motion graphic microstock otomatis dari video referensi, 5 variasi animasi, batch 50++, lengkap dengan metadata CSV siap upload. Tanpa skill After Effects."
+                    content="Generate motion graphic microstock otomatis dari video referensi, 5 variasi animasi, batch 50++, multi-rasio 16:9 & 9:16, lengkap dengan metadata CSV siap upload. Tanpa skill After Effects."
                 />
-                <meta name="keywords" content="motion graphic microstock, svg animation generator, adobe stock motion graphic, aplikasi motion graphic, batch render animasi, metadata csv microstock" />
+                <meta name="keywords" content="motion graphic microstock, svg animation generator, adobe stock motion graphic, aplikasi motion graphic, batch render animasi, metadata csv microstock, video vertikal tiktok reels shorts" />
                 <meta property="og:title" content="SVG Motion Studio v2 — Motion Graphic Microstock Tanpa After Effects" />
                 <meta property="og:description" content="Generate motion graphic microstock otomatis dari video referensi, lengkap dengan metadata CSV siap upload." />
                 <meta property="og:type" content="website" />
@@ -336,6 +389,7 @@ export default function Home() {
                     <SocialProofBar />
                     <ProblemSolutionSection />
                     <FeaturesSection />
+                    <HowItWorksSection />
                     <GoodForSection />
                     <RequirementsSection />
                     <DemoSection />
@@ -365,6 +419,7 @@ export default function Home() {
 function Navbar({ scrolled, scrollTo, mobileOpen, setMobileOpen }) {
     const navItems = [
         { id: 'fitur', label: 'Fitur' },
+        { id: 'cara-kerja', label: 'Cara Kerja' },
         { id: 'demo', label: 'Demo' },
         { id: 'testimoni', label: 'Testimoni' },
         { id: 'beli', label: 'Harga' },
@@ -428,14 +483,20 @@ function HeroSection({ scrollTo }) {
                         padding: '5px 12px', borderRadius: 20, letterSpacing: '0.05em', display: 'inline-block', marginBottom: 20,
                     }}
                 >
-                    RILIS TERBARU v2.5.7
+                    UNTUK KONTRIBUTOR MOTION GRAPHIC MICROSTOCK
                 </span>
-                <h1 style={{ fontFamily: FONT_HEAD, fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 800, lineHeight: 1.15, margin: '0 auto 20px', maxWidth: 820 }}>
-                    Bikin Motion Graphic Microstock <span style={{ color: COLOR.accent }}>Tanpa Skill After Effects</span>
+                <h1 style={{ fontFamily: FONT_HEAD, fontSize: 'clamp(26px, 4.6vw, 46px)', fontWeight: 800, lineHeight: 1.2, margin: '0 auto 20px', maxWidth: 820 }}>
+                    Masih Begadang Render Satu-Satu Motion Graphic Cuma Buat Kejar Target Upload Mingguan?
                 </h1>
-                <p style={{ color: COLOR.textMuted, fontSize: 16, lineHeight: 1.7, maxWidth: 620, margin: '0 auto 32px' }}>
-                    Cukup masukkan video referensi, SVG Motion Studio otomatis membuatkan script SVG, 5 variasi animasi,
-                    dan metadata CSV — langsung siap diunggah ke Adobe Stock & Shutterstock.
+                <p style={{ color: COLOR.textMuted, fontSize: 16, lineHeight: 1.7, maxWidth: 640, margin: '0 auto 20px' }}>
+                    Riset ide, buka After Effects, render satu per satu, lalu masih harus ketik title dan keyword manual
+                    di setiap file — waktu habis duluan sebelum sempat upload dalam jumlah banyak. Belum lagi risiko
+                    ditolak karena konten dianggap terlalu mirip satu sama lain.
+                </p>
+                <p style={{ color: COLOR.text, fontSize: 16, lineHeight: 1.7, maxWidth: 640, margin: '0 auto 32px', fontWeight: 700 }}>
+                    <span style={{ color: COLOR.accent }}>SVG Motion Studio</span> hadir supaya kamu bisa produksi motion
+                    graphic microstock secara massal — otomatis, efisien, dan hasilnya langsung sesuai standar Adobe Stock
+                    & Shutterstock tanpa perlu upscale.
                 </p>
                 <div style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
                     <button
@@ -453,7 +514,7 @@ function HeroSection({ scrollTo }) {
                     </a>
                 </div>
                 <p style={{ marginTop: 18, fontSize: 13, color: COLOR.textFaint }}>
-                    ✓ Generate 50++ motion graphic dalam ±2 jam &nbsp;·&nbsp; ✓ Effort less &nbsp;·&nbsp; ✓ Free update aplikasi
+                    ✓ Generate 50++ motion graphic dalam ±2 jam &nbsp;·&nbsp; ✓ Multi-rasio 16:9 & 9:16 &nbsp;·&nbsp; ✓ Free update aplikasi
                 </p>
             </div>
         </section>
@@ -500,15 +561,16 @@ function ProblemSolutionSection() {
                         khusus, dan menyusun metadata CSV satu-satu itu melelahkan.
                     </p>
                     <p style={{ color: COLOR.text, lineHeight: 1.8, fontWeight: 600 }}>
-                        SVG Motion Studio v2 mengotomatiskan seluruh proses itu — dari video referensi jadi motion
-                        graphic siap upload, lengkap dengan title dan tag, tanpa perlu buka After Effects sama sekali.
+                        SVG Motion Studio v2 mengotomatiskan seluruh proses itu secara batch — dari video referensi jadi
+                        motion graphic siap upload, lengkap dengan title dan tag, dengan output yang sudah sesuai standar
+                        Adobe Stock & Shutterstock tanpa perlu upscale tambahan, dan tanpa perlu buka After Effects sama sekali.
                     </p>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     <MiniStat value="5x" label="Variasi animasi otomatis" />
                     <MiniStat value="50++" label="Motion graphic per ±2 jam" />
-                    <MiniStat value="4K" label="Resolusi output tertinggi" />
-                    <MiniStat value="0" label="Skill After Effects dibutuhkan" />
+                    <MiniStat value="4K" label="Native, tanpa upscale" />
+                    <MiniStat value="16:9 & 9:16" label="Multi-rasio sekali render" />
                 </div>
             </div>
             <style jsx>{`
@@ -572,6 +634,35 @@ function FeatureCard({ icon, title, desc }) {
             <h3 style={{ fontFamily: FONT_HEAD, fontSize: 15.5, fontWeight: 700, marginBottom: 8 }}>{title}</h3>
             <p style={{ color: COLOR.textMuted, fontSize: 13.5, lineHeight: 1.65, margin: 0 }}>{desc}</p>
         </div>
+    );
+}
+
+/* =========================================================================
+   CARA KERJA (HOW IT WORKS)
+   ========================================================================= */
+
+function HowItWorksSection() {
+    const [ref, visible] = useReveal();
+    return (
+        <section id="cara-kerja" ref={ref} style={fadeStyle(visible, { padding: '80px 20px' })}>
+            <div style={{ maxWidth: MAXW, margin: '0 auto' }}>
+                <div style={{ textAlign: 'center', marginBottom: 44 }}>
+                    <h2 style={h2Style}>Dari video referensi jadi siap upload, cuma 5 langkah</h2>
+                    <p style={{ color: COLOR.textMuted, maxWidth: 560, margin: '0 auto' }}>
+                        Tidak ada proses manual yang ribet — cukup ikuti alurnya dan biarkan aplikasi bekerja secara batch di latar belakang.
+                    </p>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
+                    {HOW_IT_WORKS.map((s) => (
+                        <div key={s.step} style={{ background: COLOR.bgCard, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: '22px 20px' }}>
+                            <div style={{ fontFamily: FONT_HEAD, fontWeight: 800, fontSize: 22, color: COLOR.accent, marginBottom: 10 }}>{s.step}</div>
+                            <h3 style={{ fontFamily: FONT_HEAD, fontSize: 14.5, fontWeight: 700, marginBottom: 8 }}>{s.title}</h3>
+                            <p style={{ color: COLOR.textMuted, fontSize: 13, lineHeight: 1.65, margin: 0 }}>{s.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
     );
 }
 
