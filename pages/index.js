@@ -147,7 +147,7 @@ const HOW_IT_WORKS = [
 ];
 
 const SCREENSHOTS = [
-    { label: 'Dashboard Generate Batch', caption: 'Atur banyak project sekaligus dan pantau progres render secara real-time.', image: '/screenshots/1_dashboard.png' },
+    { label: 'Dashboard Generate Batch', caption: 'Atur banyak project sekaligus dan pantau progres render secara real-time.', image: '/screenshots/1_dasboard.png' },
     { label: 'Import Script dari AI Studio', caption: 'Tempel hasil Script SVG + JSON dari AI Studio, langsung tervalidasi dan siap dirender.', image: '/screenshots/2_copas_script.png' },
     { label: 'Pilihan Output & Background', caption: '4K/2K/HD, MOV/MP4, alpha channel, solid color, atau no background.', image: '/screenshots/3_render_setting.png' },
     { label: 'Metadata Title & ATM Tag', caption: 'Masukkan keyword riset, title dan tag tersusun otomatis siap upload.', image: '/screenshots/4_metadata.png' },
@@ -765,7 +765,7 @@ function DemoSection() {
             <div style={{ maxWidth: MAXW, margin: '0 auto' }}>
                 <div style={{ textAlign: 'center', marginBottom: 40 }}>
                     <h2 style={h2Style}>Lihat cara kerjanya</h2>
-                    <p style={{ color: COLOR.textMuted }}>Tampilan aplikasi (placeholder) — akan diganti dengan screenshot asli.</p>
+                    <p style={{ color: COLOR.textMuted }}>Tampilan langsung dari aplikasi SVG Motion Studio.</p>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 32 }} className="demo-grid">
@@ -773,16 +773,15 @@ function DemoSection() {
                     <div>
                         <div
                             style={{
-                                background: `linear-gradient(135deg, ${COLOR.bgCard}, #0b2a22)`, border: `1px solid ${COLOR.border}`,
-                                borderRadius: 14, aspectRatio: '16/10', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                flexDirection: 'column', gap: 8, position: 'relative', overflow: 'hidden',
+                                border: `1px solid ${COLOR.border}`, borderRadius: 14, aspectRatio: '16/10',
+                                overflow: 'hidden', position: 'relative', background: COLOR.bgCard,
                             }}
-                            role="img"
-                            aria-label={current.label}
                         >
-                            <span style={{ fontSize: 34 }}>🖥️</span>
-                            <span style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 15 }}>{current.label}</span>
-                            <span style={{ fontSize: 11, color: COLOR.textFaint }}>Screenshot placeholder</span>
+                            <img
+                                src={current.image}
+                                alt={current.label}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
                         </div>
                         <p style={{ textAlign: 'center', color: COLOR.textMuted, fontSize: 13, marginTop: 12, minHeight: 36 }}>{current.caption}</p>
                         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 8 }}>
