@@ -161,6 +161,7 @@ const TESTIMONIALS = [
 ];
 
 const FAQS = [
+    { q: 'Bagaimana saya menerima aplikasi dan lisensinya setelah membeli?', a: 'Setelah pembayaran berhasil, halaman berisi lisensi dan link download akan langsung muncul di layar. Lisensi dan link produk juga otomatis dikirim ke email yang kamu daftarkan — kalau tidak muncul di inbox, coba cek folder SPAM/Promosi.' },
     { q: 'Apakah saya perlu bisa After Effects atau animasi untuk pakai aplikasi ini?', a: 'Tidak perlu. Kamu cukup menyiapkan video referensi, generate Script SVG + JSON-nya lewat AI Studio memakai Paket Prompt AI dari kami, lalu import ke aplikasi untuk divalidasi dan dirender otomatis.' },
     { q: 'Jenis animasi seperti apa yang cocok dibuat dengan aplikasi ini?', a: 'Paling cocok untuk animasi 2D sederhana dengan background color gradient atau solid. Aplikasi ini tidak dirancang untuk animasi yang sangat rumit, objek 3D, atau gaya realistis.' },
     { q: 'Format dan resolusi apa saja yang didukung?', a: 'Kamu bisa memilih output 4K, 2K, atau HD dalam format MOV maupun MP4, dengan pilihan background transparan (alpha channel), solid color, atau mengikuti desain SVG aslinya.' },
